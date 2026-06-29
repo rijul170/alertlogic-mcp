@@ -10,8 +10,11 @@ A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes 
 [![MCP Protocol](https://img.shields.io/badge/MCP%20Protocol-2024--11--05-1f6feb)](https://modelcontextprotocol.io)
 [![Tools](https://img.shields.io/badge/tools-473%2B-FF6B00)](#module-overview)
 [![License](https://img.shields.io/badge/license-MIT-green)](#license)
+[![GitHub Stars](https://img.shields.io/github/stars/rijul170/alertlogic-mcp?style=social)](https://github.com/rijul170/alertlogic-mcp)
 
 </div>
+
+> **For incident responders:** Query Alert Logic MDR incidents, elaborate raw log evidence, kick off SOAR playbooks, and search logs with SQL — all through Claude. Designed for MSSP-scale multi-account operations.
 
 ---
 
@@ -465,6 +468,16 @@ PRs and issues are welcome.
 5. Run `python smoke_test.py` before submitting to verify basic functionality.
 
 ---
+
+## Related MCP Servers
+
+These three servers cover complementary layers of a security stack — network/log (AlertLogic), endpoint protection (Sophos), and EDR/threat intel (CrowdStrike). Use them together for full-stack AI-powered SOC operations.
+
+| Server | Platform | Highlights |
+|--------|----------|------------|
+| [falcon-mcp](https://github.com/rijul170/falcon-mcp) | CrowdStrike Falcon | EDR telemetry, RTR, threat intel, MSSP Flight Control, 1,296 tools |
+| [sophos-central-mcp](https://github.com/rijul170/sophos-central-mcp) | Sophos Central | Endpoint isolation, Live Discover SQL, XDR, email/firewall/DNS, 334 tools |
+| [alertlogic-mcp](https://github.com/rijul170/alertlogic-mcp) | Alert Logic MDR | Incident response, SQL log search, SOAR, vulnerability management, 473 tools |
 
 ## License
 
