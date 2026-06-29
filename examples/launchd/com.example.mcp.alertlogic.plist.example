@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.example.mcp.alertlogic</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/YOUR_USERNAME/alertlogic-mcp/.venv/bin/python3</string>
+        <string>/Users/YOUR_USERNAME/alertlogic-mcp/main.py</string>
+    </array>
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>ALERTLOGIC_API_KEY</key>
+        <string>YOUR_ALERTLOGIC_API_KEY</string>
+        <key>ALERTLOGIC_BASE_URL</key>
+        <string>https://api.cloudinsight.alertlogic.com</string>
+        <key>ALERTLOGIC_ACCOUNT_ID</key>
+        <string>YOUR_ALERTLOGIC_ACCOUNT_ID</string>
+        <key>MCP_TRANSPORT</key>
+        <string>streamable-http</string>
+        <key>MCP_HOST</key>
+        <string>127.0.0.1</string>
+        <key>MCP_PORT</key>
+        <string>8000</string>
+    </dict>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>StandardOutPath</key>
+    <string>/Users/YOUR_USERNAME/Library/Logs/mcp/alertlogic.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/YOUR_USERNAME/Library/Logs/mcp/alertlogic.err.log</string>
+</dict>
+</plist>
