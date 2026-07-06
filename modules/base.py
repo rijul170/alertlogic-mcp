@@ -11,6 +11,99 @@ from urllib.parse import quote
 import backoff
 import requests
 from mcp.server import FastMCP
+from mcp.types import ToolAnnotations
+
+# ------------------------------------------------------------------ #
+#  Safety gating                                                      #
+#                                                                     #
+#  ALERTLOGIC_MCP_READONLY=true                                       #
+#      Register only read tools. Write and destructive tools are      #
+#      never exposed to the AI client, regardless of what is asked.   #
+#                                                                     #
+#  ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE=true | tool1,tool2,...            #
+#      Destructive tools (deletes, playbook execution, scans, ...)    #
+#      are suppressed by default even with writes enabled. Set to     #
+#      'true' to arm all of them, or list specific tool names.        #
+# ------------------------------------------------------------------ #
+
+READONLY_ENV = "ALERTLOGIC_MCP_READONLY"
+ALLOW_DESTRUCTIVE_ENV = "ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE"
+
+_TRUTHY = {"1", "true", "yes", "on", "all"}
+
+# Words that signal an irreversible or high-impact operation.
+_DESTRUCTIVE_WORDS = {
+    "delete", "remove", "terminate", "revoke", "execute", "run", "launch",
+    "deploy", "reset", "expire", "purge", "destroy", "cancel", "stop",
+    "halt", "deprovision", "release",
+}
+# Words that signal a state-changing (but recoverable) operation.
+_WRITE_WORDS = {
+    "create", "update", "set", "add", "complete", "reopen", "assign",
+    "unassign", "upload", "publish", "enable", "disable", "modify", "patch",
+    "put", "post", "import", "register", "schedule", "reschedule", "start",
+    "submit", "send", "apply", "associate", "attach", "detach", "tune",
+    "move", "rename", "restore", "acknowledge", "snooze", "claim",
+    "authenticate", "change", "initiate", "trigger", "retry", "rerun",
+    "clone", "copy", "new", "save", "write", "enroll", "grant", "declare",
+    "conclude", "dispose", "undispose", "pause", "resume", "respond",
+    "checkin", "close",
+}
+# Words that signal a pure read. Only used when no mutating word matched.
+_READ_WORDS = {
+    "list", "get", "search", "query", "show", "describe", "fetch", "read",
+    "count", "status", "summary", "export", "download", "check", "lookup",
+    "find", "view", "topology", "details", "history", "types", "filters",
+    "aggregations", "stats", "info", "metadata", "validate", "test", "poll",
+    "healthcheck", "guide", "hunt", "templates",
+}
+# Tools whose names look mutating but are actually reads (or vice versa).
+_TIER_OVERRIDES = {
+    "aims_authenticate": "read",        # diagnostic; auth happens implicitly anyway
+    "inquisitor_submit_search": "read", # submits a read-only log search query
+    "soc_ir_start": "read",             # static IR playbook guide
+    "aefr_get_triggers": "read",
+    "aefr_get_trigger_by_id": "read",
+    "aefr_get_global_triggers": "read",
+    "aefr_get_global_trigger_by_path": "read",
+    "aefr_get_global_triggers_by_data_type": "read",
+    "responder_get_trigger": "read",
+    "responder_list_triggers": "read",
+    "aefr_validate_trigger": "read",
+}
+
+
+def classify_tool(name: str) -> str:
+    """Classify a tool name as 'read', 'write', or 'destructive'.
+
+    Fail-safe: a name containing no known verb is treated as 'write' so it
+    is suppressed in read-only mode rather than accidentally exposed.
+    """
+    override = _TIER_OVERRIDES.get(name)
+    if override:
+        return override
+    words = set(name.split("_"))
+    if words & _DESTRUCTIVE_WORDS:
+        return "destructive"
+    if words & _WRITE_WORDS:
+        return "write"
+    if words & _READ_WORDS:
+        return "read"
+    return "write"
+
+
+def _is_readonly_mode() -> bool:
+    return os.getenv(READONLY_ENV, "").strip().lower() in _TRUTHY
+
+
+def _destructive_allowed(name: str) -> bool:
+    value = os.getenv(ALLOW_DESTRUCTIVE_ENV, "").strip()
+    if not value:
+        return False
+    if value.lower() in _TRUTHY:
+        return True
+    allowed = {t.strip() for t in value.split(",")}
+    return name in allowed
 
 
 def url_quote(value: str) -> str:
@@ -297,10 +390,24 @@ class BaseModule:
     # ------------------------------------------------------------------ #
 
     def _add_tool(self, server: FastMCP, method: Callable, name: str, description: str, annotations=None):
-        """Register a method as an MCP tool."""
+        """Register a method as an MCP tool, applying safety gating.
+
+        Read-only mode suppresses write and destructive tools entirely;
+        destructive tools additionally require explicit opt-in via
+        ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE. Suppressed tools are never
+        registered, so the AI client cannot call them regardless of intent.
+        """
+        tier = classify_tool(name)
+        if _is_readonly_mode() and tier != "read":
+            return
+        if tier == "destructive" and not _destructive_allowed(name):
+            return
         kwargs = {"name": name, "description": description}
-        if annotations:
-            kwargs["annotations"] = annotations
+        kwargs["annotations"] = annotations or ToolAnnotations(
+            readOnlyHint=(tier == "read"),
+            destructiveHint=(tier == "destructive"),
+            openWorldHint=True,
+        )
         server.tool(**kwargs)(method)
 
     def register_tools(self, server: FastMCP):

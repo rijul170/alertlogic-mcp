@@ -1,0 +1,46 @@
+name: Tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt pytest
+
+      - name: Syntax check all modules
+        run: |
+          python -m py_compile main.py modules/*.py
+
+      - name: Server boots and registers tools
+        run: |
+          python -c "
+          import asyncio, main
+          tools = asyncio.run(main.server.list_tools())
+          assert len(tools) > 400, f'expected 400+ tools, got {len(tools)}'
+          print(f'{len(tools)} tools registered')
+          "
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/ -v

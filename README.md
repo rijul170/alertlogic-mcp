@@ -109,8 +109,8 @@ This MCP server wraps the AlertLogic MDR platform API and exposes it as 473+ str
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-org>/<repo-name>.git
-cd <repo-name>
+git clone https://github.com/rijul170/alertlogic-mcp.git
+cd alertlogic-mcp
 
 # 2. Create a virtual environment and install dependencies
 python -m venv .venv
@@ -147,6 +147,8 @@ All configuration is via environment variables, loaded from `.env` at startup.
 | `MCP_TRANSPORT`           | `stdio`        | Transport: `stdio`, `sse`, or `streamable-http`          |
 | `MCP_HOST`                | `127.0.0.1`    | Bind host (HTTP transports only)                         |
 | `MCP_PORT`                | `8000`         | Bind port (HTTP transports only)                         |
+| `ALERTLOGIC_MCP_READONLY` | _(off)_        | Set to `true` to register only read tools — write and destructive tools are never exposed to the AI client |
+| `ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE` | _(off)_ | Destructive tools (deletes, SOAR playbook execution, scan launches, ...) are suppressed by default. Set to `true` to arm all of them, or a comma-separated list of tool names to arm selectively |
 
 ### Optional service URL overrides
 
@@ -391,6 +393,15 @@ Get all open incidents for account <child-account-id>
 
 ## Security Notes
 
+- **Read-only mode**: Set `ALERTLOGIC_MCP_READONLY=true` to register only read tools at startup. Write and destructive tools are never exposed to the AI client, regardless of what is asked.
+- **Destructive operation gating**: Even with writes enabled, destructive tools (user/asset deletes, SOAR playbook execution, scan launches, key revocation, ...) are suppressed by default. Arm them explicitly via `ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE` — the recommended approach is a comma-separated list of specific tool names rather than `true`:
+
+  ```bash
+  # Enable only incident completion workflow deletes
+  ALERTLOGIC_MCP_ALLOW_DESTRUCTIVE=user_delete,playbook_execute
+  ```
+
+- Every tool carries MCP `readOnlyHint`/`destructiveHint` annotations so compliant clients can apply their own confirmation policies.
 - **Never commit `.env`.** It is excluded by `.gitignore`; only `.env.example` (with placeholders) is tracked.
 - Treat `ALERTLOGIC_API_KEY` like a password. Rotate it immediately if you suspect exposure (chat logs, screen shares, lost device).
 - **AIMS token handling**: The server exchanges your API key for a short-lived Bearer token on first use and caches it in memory. The token is refreshed automatically on expiry. The raw `secret_key` is not logged or transmitted after the initial AIMS authentication call.
