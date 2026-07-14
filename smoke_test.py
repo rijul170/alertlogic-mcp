@@ -12,18 +12,18 @@ sys.path.insert(0, str(PROJECT_DIR))
 from dotenv import load_dotenv
 load_dotenv(PROJECT_DIR / ".env")
 
-from modules.auth import AuthModule
-from modules.users import UsersModule
-from modules.deployments import DeploymentsModule
-from modules.incidents_mcp import IncidentsModule
-from modules.vulnerability import VulnerabilityModule
-from modules.seceng import SecEngModule
-from modules.soar import SOARModule
-from modules.common import CommonModule
-from modules.billing import BillingModule
-from modules.network_controls import NetworkControlsModule
-from modules.logging_integration import LoggingIntegrationModule
-from modules.credentials import CredentialsModule
+from alertlogic_mcp.modules.auth import AuthModule
+from alertlogic_mcp.modules.users import UsersModule
+from alertlogic_mcp.modules.deployments import DeploymentsModule
+from alertlogic_mcp.modules.incidents_mcp import IncidentsModule
+from alertlogic_mcp.modules.vulnerability import VulnerabilityModule
+from alertlogic_mcp.modules.seceng import SecEngModule
+from alertlogic_mcp.modules.soar import SOARModule
+from alertlogic_mcp.modules.common import CommonModule
+from alertlogic_mcp.modules.billing import BillingModule
+from alertlogic_mcp.modules.network_controls import NetworkControlsModule
+from alertlogic_mcp.modules.logging_integration import LoggingIntegrationModule
+from alertlogic_mcp.modules.credentials import CredentialsModule
 
 
 def classify(result: dict) -> tuple[str, str]:

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "alertlogic-mcp"
+version = "0.1.0"
+description = "MCP server for Alert Logic MDR — incident response, log search, SOAR, and SOC workflows"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Rijul Sharma"}]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "mcp>=1.0.0",
+    "requests>=2.32.2",
+    "pydantic>=2.6.0,<3",
+    "python-dotenv>=1.0.0",
+    "uvicorn>=0.27.0",
+    "pyjwt>=2.8.0",
+    "backoff>=2.2.1",
+    "rich>=13.7.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0.0"]
+
+[project.urls]
+Homepage = "https://github.com/rijul170/alertlogic-mcp"
+Issues = "https://github.com/rijul170/alertlogic-mcp/issues"
+
+[project.scripts]
+alertlogic-mcp = "alertlogic_mcp.server:main"
+
+[tool.setuptools.packages.find]
+include = ["alertlogic_mcp*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

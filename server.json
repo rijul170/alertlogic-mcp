@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.rijul170/alertlogic-mcp",
+  "description": "MCP server for Alert Logic MDR — incident response, log search, SOAR, and SOC workflows",
+  "version": "0.1.0",
+  "repository": {
+    "url": "https://github.com/rijul170/alertlogic-mcp",
+    "source": "github"
+  },
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "alertlogic-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

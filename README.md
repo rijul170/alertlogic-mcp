@@ -1,3 +1,5 @@
+<!-- mcp-name: io.github.rijul170/alertlogic-mcp -->
+
 <div align="center">
 
 # AlertLogic MCP Server
