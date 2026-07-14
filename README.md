@@ -6,6 +6,10 @@
 
 **Bring the full AlertLogic MDR platform into your AI assistant.**
 
+[![Tests](https://github.com/rijul170/alertlogic-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/rijul170/alertlogic-mcp/actions/workflows/test.yml)
+[![PyPI](https://img.shields.io/pypi/v/alertlogic-mcp)](https://pypi.org/project/alertlogic-mcp/)
+[![MCP Registry](https://img.shields.io/badge/MCP%20Registry-active-0A7BBB)](https://registry.modelcontextprotocol.io/v0/servers?search=io.github.rijul170/alertlogic-mcp)
+
 A [Model Context Protocol](https://modelcontextprotocol.io) server that exposes the complete AlertLogic API surface as structured tools any MCP-compatible client (Claude Desktop, Claude Code, Cursor, …) can call directly — enabling AI-powered security operations, incident response, and threat hunting at MSSP scale.
 
 [![Python](https://img.shields.io/badge/python-3.10%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
