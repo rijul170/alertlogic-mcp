@@ -13,6 +13,10 @@ __pycache__/
 venv/
 env/
 
+# Build artifacts
+build/
+dist/
+
 # IDE / OS
 .DS_Store
 .vscode/
